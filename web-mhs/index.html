@@ -12,14 +12,56 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <style>
+    :root {
+      --body-bg: #1a1a1a;
+      --body-fg: white;
+      --header-bg: #252526;
+      --header-border: #333;
+      --header-h1-fg: #ccc;
+      --left-panel-bg: #1e1e1e;
+      --left-panel-border: #000;
+      --editor-toolbar-bg: #333;
+      --file-picker-bg: #3c3c3c;
+      --file-picker-fg: white;
+      --file-picker-border: #555;
+      --right-panel-bg: #000;
+      --canvas-container-border: #333;
+      --terminal-container-bg: #000;
+      --close-btn-bg: rgba(60, 60, 60, 0.8);
+      --close-btn-bg-hover: rgba(90, 90, 90, 0.9);
+      --close-btn-fg: white;
+      --close-btn-border: #555;
+    }
+
+    :root[data-theme="light"] {
+      --body-bg: #f5f5f5;
+      --body-fg: #1a1a1a;
+      --header-bg: #ffffff;
+      --header-border: #ddd;
+      --header-h1-fg: #333;
+      --left-panel-bg: #ffffff;
+      --left-panel-border: #ccc;
+      --editor-toolbar-bg: #e8e8e8;
+      --file-picker-bg: #ffffff;
+      --file-picker-fg: #1a1a1a;
+      --file-picker-border: #bbb;
+      --right-panel-bg: #ffffff;
+      --canvas-container-border: #ddd;
+      --terminal-container-bg: #ffffff;
+      --close-btn-bg: rgba(230, 230, 230, 0.9);
+      --close-btn-bg-hover: rgba(210, 210, 210, 0.95);
+      --close-btn-fg: #1a1a1a;
+      --close-btn-border: #bbb;
+    }
+
     body,
     html {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background-color: #1a1a1a;
-      color: white;
+      background-color: var(--body-bg);
+      color: var(--body-fg);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       flex-direction: column;
@@ -28,19 +70,19 @@
 
     /* Slimmed down header for desktop */
     #header {
-      background: #252526;
+      background: var(--header-bg);
       padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid var(--header-border);
       flex-shrink: 0;
     }
 
     #header h1 {
       margin: 0;
       font-size: 1.2rem;
-      color: #ccc;
+      color: var(--header-h1-fg);
     }
 
     .button-row {
@@ -51,6 +93,24 @@
     .button-row button {
       cursor: pointer;
       padding: 4px 10px;
+    }
+
+    .font-size-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .font-size-control button {
+      cursor: pointer;
+      padding: 4px 10px;
+    }
+
+    #font-size-display {
+      color: var(--header-h1-fg);
+      font-size: 0.85rem;
+      min-width: 34px;
+      text-align: center;
     }
 
     /* The Workspace: Splits the screen horizontally */
@@ -66,21 +126,21 @@
       flex: 0 0 50%;
       display: flex;
       flex-direction: column;
-      border-right: 2px solid #000;
-      background: #1e1e1e;
+      border-right: 2px solid var(--left-panel-border);
+      background: var(--left-panel-bg);
     }
 
     #editor-toolbar {
-      background: #333;
+      background: var(--editor-toolbar-bg);
       padding: 5px 10px;
       display: flex;
       gap: 10px;
     }
 
     #file-picker {
-      background: #3c3c3c;
-      color: white;
-      border: 1px solid #555;
+      background: var(--file-picker-bg);
+      color: var(--file-picker-fg);
+      border: 1px solid var(--file-picker-border);
       padding: 2px 5px;
       flex-grow: 1;
       cursor: pointer;
@@ -114,21 +174,21 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #000;
+      background: var(--right-panel-bg);
     }
 
     #canvas-container {
       flex: 1.5;
       /* Canvas gets slightly more space than the terminal */
       position: relative;
-      border-bottom: 2px solid #333;
+      border-bottom: 2px solid var(--canvas-container-border);
       overflow: hidden;
     }
 
     #terminal-container {
       flex: 1;
       position: relative;
-      background: #000;
+      background: var(--terminal-container-bg);
     }
 
     #terminal {
@@ -152,16 +212,16 @@
       top: 10px;
       right: 10px;
       z-index: 10;
-      background-color: rgba(60, 60, 60, 0.8);
-      color: white;
-      border: 1px solid #555;
+      background-color: var(--close-btn-bg);
+      color: var(--close-btn-fg);
+      border: 1px solid var(--close-btn-border);
       border-radius: 4px;
       padding: 4px 8px;
       cursor: pointer;
     }
 
     #close-canvas-btn:hover {
-      background-color: rgba(90, 90, 90, 0.9);
+      background-color: var(--close-btn-bg-hover);
     }
 
     /* Responsive fallback for when you resize the window or use a tablet/phone */
@@ -188,6 +248,12 @@
       <input type="file" id="fallback-picker" webkitdirectory directory multiple style="display:none;">
       <button id="mount-btn">📁 Mount Folder</button>
       <button id="download-url-btn">🌐 GitHub</button>
+      <div class="font-size-control">
+        <button id="font-decrease-btn" title="Decrease font size">A−</button>
+        <span id="font-size-display">14px</span>
+        <button id="font-increase-btn" title="Increase font size">A+</button>
+      </div>
+      <button id="theme-toggle-btn">🌙 Dark</button>
     </div>
   </div>
 
@@ -268,6 +334,79 @@ main = display $ Color red $ SolidCircle 50
 
     const home = `/home/web_user`;
 
+    const darkAceTheme = "ace/theme/monokai";
+    const lightAceTheme = "ace/theme/github";
+
+    const darkTermTheme = {
+      background: '#000000',
+      foreground: '#ffffff',
+      red: '#ff5555',
+      green: '#50fa7b',
+      yellow: '#f1fa8c',
+      blue: '#bd93f9',
+      cyan: '#8be9fd'
+    };
+
+    const lightTermTheme = {
+      background: '#ffffff',
+      foreground: '#1a1a1a',
+      cursor: '#1a1a1a',
+      red: '#c62828',
+      green: '#2e7d32',
+      yellow: '#a37c00',
+      blue: '#1565c0',
+      cyan: '#00838f'
+    };
+
+    function getSavedTheme() {
+      return localStorage.getItem('mhs_theme') === 'light' ? 'light' : 'dark';
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('mhs_theme', theme);
+
+      const btn = document.getElementById('theme-toggle-btn');
+      if (btn) btn.textContent = theme === 'light' ? '☀️ Light' : '🌙 Dark';
+
+      if (window.editor) {
+        window.editor.setTheme(theme === 'light' ? lightAceTheme : darkAceTheme);
+      }
+      if (window.term) {
+        window.term.options.theme = theme === 'light' ? lightTermTheme : darkTermTheme;
+      }
+    }
+
+    // Apply saved theme immediately to avoid a flash of the wrong theme.
+    document.documentElement.setAttribute('data-theme', getSavedTheme());
+
+    const DEFAULT_FONT_SIZE = 14;
+    const MIN_FONT_SIZE = 10;
+    const MAX_FONT_SIZE = 28;
+
+    function getSavedFontSize() {
+      const saved = parseInt(localStorage.getItem('mhs_font_size'), 10);
+      if (!saved || saved < MIN_FONT_SIZE || saved > MAX_FONT_SIZE) return DEFAULT_FONT_SIZE;
+      return saved;
+    }
+
+    function applyFontSize(size) {
+      size = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+      localStorage.setItem('mhs_font_size', size);
+
+      const display = document.getElementById('font-size-display');
+      if (display) display.textContent = size + 'px';
+
+      if (window.editor) {
+        window.editor.setFontSize(size + 'px');
+      }
+      if (window.term) {
+        window.term.options.fontSize = size;
+        if (window.fitAddon) window.fitAddon.fit();
+      }
+      return size;
+    }
+
     const system_prefix = `\r\n\x1b[32m[System]\x1b[0m `;
 
     const canvas = document.getElementById('drawing-canvas');
@@ -284,43 +423,55 @@ main = display $ Color red $ SolidCircle 50
     };
 
     window.onload = function() {
+      const currentTheme = getSavedTheme();
+      const currentFontSize = getSavedFontSize();
+
       const term = new Terminal({
         allowProposedApi: true,
         cursorBlink: true,
         rightClickSelectsWord: true,
         fontFamily: 'monospace',
-        fontSize: 16,
-        theme: {
-          background: '#000000',
-          red: '#ff5555',
-          green: '#50fa7b',
-          yellow: '#f1fa8c',
-          blue: '#bd93f9',
-          cyan: '#8be9fd',
-          foreground: '#ffffff'
-        }
+        fontSize: currentFontSize,
+        theme: currentTheme === 'light' ? lightTermTheme : darkTermTheme
       });
+      window.term = term;
 
       const unicode11Addon = new Unicode11Addon.Unicode11Addon();
       term.loadAddon(unicode11Addon);
       term.unicode.activeVersion = '11';
 
       const fitAddon = new FitAddon.FitAddon();
+      window.fitAddon = fitAddon;
       term.loadAddon(fitAddon);
       term.open(document.getElementById('terminal'));
       fitAddon.fit();
 
       const editor = ace.edit("editor-container");
+      window.editor = editor;
 
-      editor.setTheme("ace/theme/monokai"); // A nice dark theme matching the UI
+      editor.setTheme(currentTheme === 'light' ? lightAceTheme : darkAceTheme);
       editor.session.setMode("ace/mode/haskell");
 
       editor.setOptions({
-        fontSize: "14px",
+        fontSize: currentFontSize + "px",
         fontFamily: "Menlo, Monaco, 'Courier New', monospace",
         wrap: true, // Wraps long lines
         showPrintMargin: false, // Hides the annoying vertical line in the middle
         behavioursEnabled: true // Auto-closes brackets and quotes
+      });
+
+      document.getElementById('theme-toggle-btn').textContent = currentTheme === 'light' ? '☀️ Light' : '🌙 Dark';
+      document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+        const next = getSavedTheme() === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+      });
+
+      document.getElementById('font-size-display').textContent = currentFontSize + 'px';
+      document.getElementById('font-decrease-btn').addEventListener('click', () => {
+        applyFontSize(getSavedFontSize() - 1);
+      });
+      document.getElementById('font-increase-btn').addEventListener('click', () => {
+        applyFontSize(getSavedFontSize() + 1);
       });
 
       function getUrlArgs() {
